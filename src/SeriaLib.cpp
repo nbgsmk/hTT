@@ -15,7 +15,7 @@
  This is a licence-free software, it can be used by anyone who try to build a better world.
  */
 
-#include "serialib.h"
+#include "SeriaLib.h"
 
 //_____________________________________
 // ::: Constructors and destructors :::
@@ -23,18 +23,15 @@
 /*!
  \brief      Constructor of the class serialib.
  */
-serialib::serialib() {
-
-#if defined (__linux__) || defined(__APPLE__)
+SeriaLib::SeriaLib() {
 	fd = -1;
-#endif
 }
 
 /*!
  \brief      Destructor of the class serialib. It close the connection
  */
 // Class desctructor
-serialib::~serialib() {
+SeriaLib::~SeriaLib() {
 	closeDevice();
 }
 
@@ -126,7 +123,7 @@ serialib::~serialib() {
  \return -8 Stopbits not recognized
  \return -9 Parity not recognized
  */
-char serialib::openDevice(const char *Device, const unsigned int Bauds, SerialDataBits Databits, SerialParity Parity, SerialStopBits Stopbits) {
+char SeriaLib::openDevice(const char *Device, const unsigned int Bauds, SerialDataBits Databits, SerialParity Parity, SerialStopBits Stopbits) {
 
 #if defined (__linux__) || defined(__APPLE__)
 	// Structure with the device's options
@@ -135,8 +132,9 @@ char serialib::openDevice(const char *Device, const unsigned int Bauds, SerialDa
 	// Open device
 	fd = open(Device, O_RDWR | O_NOCTTY | O_NDELAY);
 	// If the device is not open, return -1
-	if (fd == -1)
+	if (fd == -1){
 		return -2;
+	}
 	// Open the device in nonblocking mode
 	fcntl(fd, F_SETFL, FNDELAY);
 
@@ -314,20 +312,16 @@ char serialib::openDevice(const char *Device, const unsigned int Bauds, SerialDa
 
 }
 
-bool serialib::isDeviceOpen() {
-#if defined (__linux__) || defined(__APPLE__)
+bool SeriaLib::isDeviceOpen() {
 	return fd >= 0;
-#endif
 }
 
 /*!
  \brief Close the connection with the current device
  */
-void serialib::closeDevice() {
-#if defined (__linux__) || defined(__APPLE__)
+void SeriaLib::closeDevice() {
 	close(fd);
 	fd = -1;
-#endif
 }
 
 //___________________________________________
@@ -339,15 +333,12 @@ void serialib::closeDevice() {
  \return 1 success
  \return -1 error while writting data
  */
-int serialib::writeChar(const char Byte) {
-#if defined (__linux__) || defined(__APPLE__)
+int SeriaLib::writeChar(const char Byte) {
 	// Write the char
-	if (write(fd, &Byte, 1) != 1)
+	if (write(fd, &Byte, 1) != 1) {
 		return -1;
-
-	// Write operation successfull
-	return 1;
-#endif
+	}
+	return 1;	// Write operation successfull
 }
 
 //________________________________________
@@ -359,16 +350,14 @@ int serialib::writeChar(const char Byte) {
  \return     1 success
  \return    -1 error while writting data
  */
-int serialib::writeString(const char *receivedString) {
-#if defined (__linux__) || defined(__APPLE__)
+int SeriaLib::writeString(const char *receivedString) {
 	// Lenght of the string
 	int Lenght = strlen(receivedString);
 	// Write the string
-	if (write(fd, receivedString, Lenght) != Lenght)
+	if (write(fd, receivedString, Lenght) != Lenght){
 		return -1;
-	// Write operation successfull
-	return 1;
-#endif
+	}
+	return 1;	// Write operation successfull
 }
 
 // _____________________________________
@@ -381,14 +370,13 @@ int serialib::writeString(const char *receivedString) {
  \return 1 success
  \return -1 error while writting data
  */
-int serialib::writeBytes(const void *Buffer, const unsigned int NbBytes) {
-#if defined (__linux__) || defined(__APPLE__)
+int SeriaLib::writeBytes(const void *Buffer, const unsigned int NbBytes) {
 	// Write data
-	if (write(fd, Buffer, NbBytes) != (ssize_t) NbBytes)
+	if (write(fd, Buffer, NbBytes) != (ssize_t) NbBytes){
 		return -1;
+	}
 	// Write operation successfull
 	return 1;
-#endif
 }
 
 /*!
@@ -401,8 +389,7 @@ int serialib::writeBytes(const void *Buffer, const unsigned int NbBytes) {
  \return -1 error while setting the Timeout
  \return -2 error while reading the byte
  */
-int serialib::readChar(char *pByte, unsigned int timeOut_ms) {
-#if defined (__linux__) || defined(__APPLE__)
+int SeriaLib::readChar(char *pByte, unsigned int timeOut_ms) {
 	// Timer used for timeout
 	timeOut timer;
 	// Initialise the timer
@@ -418,7 +405,6 @@ int serialib::readChar(char *pByte, unsigned int timeOut_ms) {
 		}
 	}
 	return 0;
-#endif
 }
 
 /*!
@@ -431,7 +417,7 @@ int serialib::readChar(char *pByte, unsigned int timeOut_ms) {
  \return -2 error while reading the byte
  \return -3 MaxNbBytes is reached
  */
-int serialib::readStringNoTimeOut(char *receivedString, char finalChar, unsigned int maxNbBytes) {
+int SeriaLib::readStringNoTimeOut(char *receivedString, char finalChar, unsigned int maxNbBytes) {
 	// Number of characters read
 	unsigned int NbBytes = 0;
 	// Returned value from Read
@@ -476,10 +462,11 @@ int serialib::readStringNoTimeOut(char *receivedString, char finalChar, unsigned
  \return -2 error while reading the character
  \return -3 MaxNbBytes is reached
  */
-int serialib::readString(char *receivedString, char finalChar, unsigned int maxNbBytes, unsigned int timeOut_ms) {
+int SeriaLib::readString(char *receivedString, char finalChar, unsigned int maxNbBytes, unsigned int timeOut_ms) {
 	// Check if timeout is requested
-	if (timeOut_ms == 0)
+	if (timeOut_ms == 0){
 		return readStringNoTimeOut(receivedString, finalChar, maxNbBytes);
+	}
 
 	// Number of bytes read
 	unsigned int nbBytes = 0;
@@ -516,8 +503,9 @@ int serialib::readString(char *receivedString, char finalChar, unsigned int maxN
 			}
 			// Check if an error occured during reading char
 			// If an error occurend, return the error number
-			if (charRead < 0)
+			if (charRead < 0){
 				return charRead;
+			}
 		}
 		// Check if timeout is reached
 		if (timer.elapsedTime_ms() > timeOut_ms) {
@@ -545,8 +533,7 @@ int serialib::readString(char *receivedString, char finalChar, unsigned int maxN
  \return -1 error while setting the Timeout
  \return -2 error while reading the byte
  */
-int serialib::readBytes(void *buffer, unsigned int maxNbBytes, unsigned int timeOut_ms, unsigned int sleepDuration_us) {
-#if defined (__linux__) || defined(__APPLE__)
+int SeriaLib::readBytes(void *buffer, unsigned int maxNbBytes, unsigned int timeOut_ms, unsigned int sleepDuration_us) {
 	// Timer used for timeout
 	timeOut timer;
 	// Initialise the timer
@@ -559,23 +546,24 @@ int serialib::readBytes(void *buffer, unsigned int maxNbBytes, unsigned int time
 		// Try to read a byte on the device
 		int Ret = read(fd, (void*) Ptr, maxNbBytes - NbByteRead);
 		// Error while reading
-		if (Ret == -1)
+		if (Ret == -1){
 			return -2;
+		}
 
 		// One or several byte(s) has been read on the device
 		if (Ret > 0) {
 			// Increase the number of read bytes
 			NbByteRead += Ret;
 			// Success : bytes has been read
-			if (NbByteRead >= maxNbBytes)
+			if (NbByteRead >= maxNbBytes){
 				return NbByteRead;
+			}
 		}
 		// Suspend the loop to avoid charging the CPU
 		usleep(sleepDuration_us);
 	}
 	// Timeout reached, return the number of bytes read
 	return NbByteRead;
-#endif
 }
 
 // _________________________
@@ -587,26 +575,21 @@ int serialib::readBytes(void *buffer, unsigned int maxNbBytes, unsigned int time
  \return If the function succeeds, the return value is nonzero.
  If the function fails, the return value is zero.
  */
-char serialib::flushReceiver() {
-#if defined (__linux__) || defined(__APPLE__)
+char SeriaLib::flushReceiver() {
 	// Purge receiver
 	tcflush(fd, TCIFLUSH);
 	return true;
-#endif
 }
 
 /*!
  \brief  Return the number of bytes in the received buffer (UNIX only)
  \return The number of bytes received by the serial provider but not yet read.
  */
-int serialib::available() {
-#if defined (__linux__) || defined(__APPLE__)
+int SeriaLib::available() {
 	int nBytes = 0;
 	// Return number of pending bytes in the receiver
 	ioctl(fd, FIONREAD, &nBytes);
 	return nBytes;
-#endif
-
 }
 
 // __________________
@@ -621,14 +604,14 @@ int serialib::available() {
  \return     If the function fails, the return value is false
  If the function succeeds, the return value is true.
  */
-bool serialib::DTR(bool status) {
-	if (status)
-		// Set DTR
-		return this->setDTR();
-	else
-		// Unset DTR
-		return this->clearDTR();
+bool SeriaLib::DTR(bool status) {
+	if (status){
+		return this->setDTR();			// Set DTR
+	} else {
+		return this->clearDTR();		// Unset DTR
+	}
 }
+
 
 /*!
  \brief      Set the bit DTR (pin 4)
@@ -636,15 +619,13 @@ bool serialib::DTR(bool status) {
  \return     If the function fails, the return value is false
  If the function succeeds, the return value is true.
  */
-bool serialib::setDTR() {
-#if defined (__linux__) || defined(__APPLE__)
+bool SeriaLib::setDTR() {
 	// Set DTR
 	int status_DTR = 0;
 	ioctl(fd, TIOCMGET, &status_DTR);
 	status_DTR |= TIOCM_DTR;
 	ioctl(fd, TIOCMSET, &status_DTR);
 	return true;
-#endif
 }
 
 /*!
@@ -653,15 +634,13 @@ bool serialib::setDTR() {
  \return     If the function fails, the return value is false
  If the function succeeds, the return value is true.
  */
-bool serialib::clearDTR() {
-#if defined (__linux__) || defined(__APPLE__)
+bool SeriaLib::clearDTR() {
 	// Clear DTR
 	int status_DTR = 0;
 	ioctl(fd, TIOCMGET, &status_DTR);
 	status_DTR &= ~TIOCM_DTR;
 	ioctl(fd, TIOCMSET, &status_DTR);
 	return true;
-#endif
 }
 
 /*!
@@ -673,13 +652,12 @@ bool serialib::clearDTR() {
  \return     false if the function fails
  \return     true if the function succeeds
  */
-bool serialib::RTS(bool status) {
-	if (status)
-		// Set RTS
-		return this->setRTS();
-	else
-		// Unset RTS
-		return this->clearRTS();
+bool SeriaLib::RTS(bool status) {
+	if (status){
+		return this->setRTS();			// Set RTS
+	} else {
+		return this->clearRTS();		// Unset RTS
+	}
 }
 
 /*!
@@ -688,15 +666,12 @@ bool serialib::RTS(bool status) {
  \return     If the function fails, the return value is false
  If the function succeeds, the return value is true.
  */
-bool serialib::setRTS() {
-#if defined (__linux__) || defined(__APPLE__)
-	// Set RTS
-	int status_RTS = 0;
+bool SeriaLib::setRTS() {
+	int status_RTS = 0;					// Set RTS
 	ioctl(fd, TIOCMGET, &status_RTS);
 	status_RTS |= TIOCM_RTS;
 	ioctl(fd, TIOCMSET, &status_RTS);
 	return true;
-#endif
 }
 
 /*!
@@ -705,15 +680,13 @@ bool serialib::setRTS() {
  \return     If the function fails, the return value is false
  If the function succeeds, the return value is true.
  */
-bool serialib::clearRTS() {
-#if defined (__linux__) || defined(__APPLE__)
+bool SeriaLib::clearRTS() {
 	// Clear RTS
 	int status_RTS = 0;
 	ioctl(fd, TIOCMGET, &status_RTS);
 	status_RTS &= ~TIOCM_RTS;
 	ioctl(fd, TIOCMSET, &status_RTS);
 	return true;
-#endif
 }
 
 /*!
@@ -721,13 +694,11 @@ bool serialib::clearRTS() {
  CTS stands for Clear To Send
  \return     Return true if CTS is set otherwise false
  */
-bool serialib::isCTS() {
-#if defined (__linux__) || defined(__APPLE__)
+bool SeriaLib::isCTS() {
 	int status = 0;
 	//Get the current status of the CTS bit
 	ioctl(fd, TIOCMGET, &status);
 	return status & TIOCM_CTS;
-#endif
 }
 
 /*!
@@ -735,13 +706,11 @@ bool serialib::isCTS() {
  DSR stands for Data Set Ready
  \return     Return true if DTR is set otherwise false
  */
-bool serialib::isDSR() {
-#if defined (__linux__) || defined(__APPLE__)
+bool SeriaLib::isDSR() {
 	int status = 0;
 	//Get the current status of the DSR bit
 	ioctl(fd, TIOCMGET, &status);
 	return status & TIOCM_DSR;
-#endif
 }
 
 /*!
@@ -750,13 +719,11 @@ bool serialib::isDSR() {
  \return     true if DCD is set
  \return     false otherwise
  */
-bool serialib::isDCD() {
-#if defined (__linux__) || defined(__APPLE__)
+bool SeriaLib::isDCD() {
 	int status = 0;
 	//Get the current status of the DCD bit
 	ioctl(fd, TIOCMGET, &status);
 	return status & TIOCM_CAR;
-#endif
 }
 
 /*!
@@ -764,13 +731,11 @@ bool serialib::isDCD() {
  Ring Indicator
  \return     Return true if RING is set otherwise false
  */
-bool serialib::isRI() {
-#if defined (__linux__) || defined(__APPLE__)
+bool SeriaLib::isRI() {
 	int status = 0;
 	//Get the current status of the RING bit
 	ioctl(fd, TIOCMGET, &status);
 	return status & TIOCM_RNG;
-#endif
 }
 
 /*!
@@ -779,13 +744,11 @@ bool serialib::isRI() {
  May behave abnormally on Windows
  \return     Return true if CTS is set otherwise false
  */
-bool serialib::isDTR() {
-#if defined (__linux__) || defined(__APPLE__)
+bool SeriaLib::isDTR() {
 	int status = 0;
 	//Get the current status of the DTR bit
 	ioctl(fd, TIOCMGET, &status);
 	return status & TIOCM_DTR;
-#endif
 }
 
 /*!
@@ -794,13 +757,11 @@ bool serialib::isDTR() {
  May behave abnormally on Windows
  \return     Return true if RTS is set otherwise false
  */
-bool serialib::isRTS() {
-#if defined (__linux__) || defined(__APPLE__)
+bool SeriaLib::isRTS() {
 	int status = 0;
 	//Get the current status of the CTS bit
 	ioctl(fd, TIOCMGET, &status);
 	return status & TIOCM_RTS;
-#endif
 }
 
 // ******************************************

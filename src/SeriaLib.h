@@ -70,24 +70,23 @@ enum SerialParity {
 /*!  \class     serialib
  \brief     This class is used for communication over a serial device.
  */
-class serialib {
+class SeriaLib {
 	public:
 
 		//_____________________________________
 		// ::: Constructors and destructors :::
 
 		// Constructor of the class
-		serialib();
+		SeriaLib();
 
 		// Destructor
-		~serialib();
+		~SeriaLib();
 
 		//_________________________________________
 		// ::: Configuration and initialization :::
 
 		// Open a device
-		char openDevice(const char *Device, const unsigned int Bauds, SerialDataBits Databits = SERIAL_DATABITS_8, SerialParity Parity = SERIAL_PARITY_NONE,
-		        SerialStopBits Stopbits = SERIAL_STOPBITS_1);
+		char openDevice(const char *Device, const unsigned int Bauds, SerialDataBits Databits = SERIAL_DATABITS_8, SerialParity Parity = SERIAL_PARITY_NONE, SerialStopBits Stopbits = SERIAL_STOPBITS_1);
 
 		// Check device opening state
 		bool isDeviceOpen();
@@ -170,9 +169,7 @@ class serialib {
 		bool currentStateRTS;
 		bool currentStateDTR;
 
-#if defined (__linux__) || defined(__APPLE__)
 		int fd;
-#endif
 
 };
 
