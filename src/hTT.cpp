@@ -57,7 +57,7 @@ int main() {
 			if(input_line.size() > 0) {
 				// vektori sluze samo za prikaz na ekranu
 			    std::vector<string>		splitStr;
-			    std::vector<int>		resultHex;
+			    std::vector<int>		resultInt16base;
 			    std::vector<uint8_t>	resultChar;
 			    const std::regex rgx("( )+");			// regex pattern splituje na bilo kakav white space
 			    std::sregex_token_iterator iter(input_line.begin(), input_line.end(), rgx, -1);
@@ -90,22 +90,22 @@ int main() {
 
 					// vektori sluze samo za prikaz
 					splitStr.push_back(iter->str());
-			    	resultHex.push_back(intVal);
+					resultInt16base.push_back(intVal);
 			    	resultChar.push_back(hexChar);
 					serial.writeChar(hexChar);
 					// cout << "s=" << iter->str() << "\t h=" << intVal << "\t x=" << hexChar << endl;
 					usleep(1000);		// malo pauze izmedju karaktera (1mS)
 			    }
-			    cout << "str=";
-			    for (unsigned int i = 0; i < splitStr.size(); ++i) { cout << "\t" << splitStr.at(i); }
+			    cout << "hex str=";
+			    for (unsigned int i = 0; i < splitStr.size(); ++i) { cout << " " << splitStr.at(i); }
 			    cout << endl;
 
-			    cout << "hex=";
-			    for (unsigned int i = 0; i < splitStr.size(); ++i) { cout << "\t" << resultHex.at(i); }
+			    cout << "str2int=";
+			    for (unsigned int i = 0; i < splitStr.size(); ++i) { cout << " " << resultInt16base.at(i); }
 			    cout << endl;
 
-			    cout << "chr=";
-			    for (unsigned int i = 0; i < splitStr.size(); ++i) { cout << "\t" << resultChar.at(i); }
+			    cout << "8bitchr=";
+			    for (unsigned int i = 0; i < splitStr.size(); ++i) { cout << " " << resultChar.at(i); }
 			    cout << endl;
 
 
