@@ -37,4 +37,10 @@ Konektuje se samo na /dev/ttyS0, to mozes lagano da promenis na pocetku TT.cpp f
 Srecno!
 
 
+https://www.sciencebuddies.org/cdn/references/ascii-table.png
+
+![ascii-table](https://github.com/nbgsmk/hTT/assets/60575976/3c2747f2-7f34-4800-bd51-9817a3f7b76e)
+
+
+
 
