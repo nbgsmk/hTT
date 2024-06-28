@@ -24,7 +24,10 @@ Unesi hex npr ovako  5a 4f 4b 49
 
 Ili napravi tekstualni fajl sa pojedinim redovima kao sto bi ukucavao, pa ga pozovi ovako
 
-./hTT < fajl.txt    // sto znaci, citaj ulaz iz tekstualnog fajla
+./hTT < fajl.txt    
+
+
+sto znaci, citaj ulaz iz tekstualnog fajla
 
     
 Za sada ne vraca nikakav odgovor, napravicemo i to.
