@@ -64,7 +64,11 @@ int main() {
 					uint8_t x = (uint8_t) stoi(iter->str(), 0, 16);
 					cout << "s=" << iter->str() << "\t h=" << h << "\t x=" << x << endl;
 					serial.writeChar(h);
+					usleep(1000);		// 1mS malo pauze izmedju karaktera
 			    }
+
+			    usleep(1000 * 2000);		// dve sekunde pauze izmedju redova
+
 			}
 		}
     }
