@@ -6,14 +6,7 @@
  */
 
 #include <iostream>
-#include <unistd.h>
-#include <stdio.h>
-#include <cstring>
 #include <cinttypes>
-#include <vector>
-#include <sstream>
-#include <algorithm>    // copy
-#include <iterator>     // back_inserter
 #include <regex>        // regex, sregex_token_iterator
 
 #include "LineParser.h"
@@ -98,7 +91,7 @@ void LineParser::logPrint(vector<string> stringovi, vector<int> intovi, vector<u
 		cout << endl;
 
 		cout << "8bitchr=";
-		for (unsigned int i = 0; i < charovi.size(); ++i) { cout << " " << charovi.at(i); }
+		for (unsigned int i = 0; i < charovi.size(); ++i) { cout << " " << charovi.at(i) << " "; }
 		cout << endl;
 	}
 }

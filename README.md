@@ -43,4 +43,14 @@ https://www.sciencebuddies.org/cdn/references/ascii-table.png
 
 
 
+--------- podsetnik --------
+
+https://stackoverflow.com/questions/76299250/how-to-use-getline-in-a-separate-thread-in-c
+https://stackoverflow.com/a/76334993
+
+https://www.onlinegdb.com/E9Gwgje7T
+
+https://stackoverflow.com/a/42264216
+
+
 
