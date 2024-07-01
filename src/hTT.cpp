@@ -21,6 +21,7 @@
 #include "LineParser.h"
 
 #define SERIAL_PORT "/dev/ttyS0"
+#define BAUD 115200
 
 using namespace std;
 
@@ -28,9 +29,10 @@ using namespace std;
 void tx(SeriaLib sr){
 	LineParser *lp = new LineParser();
 	string input_line = "";
-    while(true){
+    while(cin){
     	getline(cin, input_line);
-    	cout << input_line << endl;
+//    	cout << "cin get=" << cin.get() << endl;
+    	cout << "isatty " << isatty(cin.get()) << endl;
     	if (input_line.compare(".") == 0) {
 			cout << "Ћао!" << endl;
 			break;
@@ -58,7 +60,7 @@ void rx(SeriaLib sr){
 		} else {
 			// cout << "no reply" ;
 		}
-		usleep(1000 * 5);
+		// usleep(1000 * 5);
 	}
 
 }
@@ -70,7 +72,7 @@ int main() {
     SeriaLib serial;
 
     // Connection to serial port
-    char errorOpening = serial.openDevice(SERIAL_PORT, 115200);
+    char errorOpening = serial.openDevice(SERIAL_PORT, BAUD);
 
 
     // If connection fails, return the error code otherwise, display a success message
@@ -78,11 +80,11 @@ int main() {
     	cout << "Error connecting to " << SERIAL_PORT << endl;
     	return errorOpening;
     } else {
-    	cout << "Connected to " << SERIAL_PORT << endl;
+    	cout << "Connected to " << SERIAL_PORT << " at " << BAUD << endl;
     }
 
-    cout << "Unesi HEX znakove, red po red" << endl;
-    cout << "Za kraj unesi samo tacku na pocetku reda, npr ovako" << endl;
+    cout << "Unesi HEX karaktere, red po red" << endl;
+    cout << "Za kraj unesi samo tacku u novom redu, npr ovako" << endl;
     cout << "." << endl;
     cout << endl;
 
@@ -94,35 +96,4 @@ int main() {
 
     return 0;
 
-//    LineParser *lp = new LineParser();
-//    string input_line;
-//    while(cin){
-//    	getline(cin, input_line);
-//    	cout << input_line << endl;
-//    	if (input_line.compare(".") == 0) {
-//			cout << "Ћао!" << endl;
-//			break;
-//		} else {
-//			if(input_line.size() > 0) {
-//				vector<uint8_t> rezultat = lp->parse(input_line);
-//
-//			    // buffer za primljene karaktere
-//			    unsigned int rcvSize = 2000;
-//			    for (int i = 0; i < 3; ++i) {
-//				    char rcv[rcvSize];
-//				    if (serial.available() > 0) {
-//				    	serial.readString(rcv, '\n', rcvSize, 100);
-//						cout << "odgovor " << rcv << endl;
-//					}
-//				}
-//
-//			    usleep(1000 * 2000);		// dve sekunde pauze izmedju redova
-//
-//			}
-//		}
-//    }
-//
-//    serial.closeDevice();    // Close the serial device
-
-//	return 0;
 }
