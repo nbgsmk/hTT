@@ -9,19 +9,59 @@
 #include <iostream>
 #include <unistd.h>
 #include <stdio.h>
-#include <cstring>
+#include <string>
 #include <cinttypes>
 #include <vector>
 #include <sstream>
 #include <algorithm>    // copy
 #include <iterator>     // back_inserter
 #include <regex>        // regex, sregex_token_iterator
+#include <thread>
 #include "SeriaLib.h"
+#include "LineParser.h"
 
 #define SERIAL_PORT "/dev/ttyS0"
 
 using namespace std;
 
+
+void tx(SeriaLib sr){
+	LineParser *lp = new LineParser();
+	string input_line = "";
+    while(true){
+    	getline(cin, input_line);
+    	cout << input_line << endl;
+    	if (input_line.compare(".") == 0) {
+			cout << "Ћао!" << endl;
+			break;
+		} else {
+			if(input_line.size() > 0) {
+				vector<uint8_t> hexCharovi = lp->parse(input_line);
+				for (unsigned int i = 0; i < hexCharovi.size(); ++i) {
+					sr.writeChar(hexCharovi.at(i));
+				}
+			}
+		}
+    }
+
+}
+
+void rx(SeriaLib sr){
+    // buffer za primljene karaktere
+    unsigned int rcvSize = 2000;
+	while (true) {
+		char rcv[rcvSize];
+		if (sr.available() > 0) {
+			sr.readString(rcv, '\n', rcvSize-1, 5);
+//			cout << "odgovor " << rcv << endl;
+			cout << rcv;
+		} else {
+			// cout << "no reply" ;
+		}
+		usleep(1000 * 5);
+	}
+
+}
 
 int main() {
 	cout << "Hey" << endl; // prints Hey
@@ -46,86 +86,43 @@ int main() {
     cout << "." << endl;
     cout << endl;
 
-    string input_line;
-    while(cin){
-    	getline(cin, input_line);
-    	cout << input_line << endl;
-    	if (input_line.compare(".") == 0) {
-			cout << "Ћао!" << endl;
-			break;
-		} else {
-			if(input_line.size() > 0) {
-				// vektori sluze samo za prikaz na ekranu
-			    std::vector<string>		splitStr;
-			    std::vector<int>		resultInt16base;
-			    std::vector<uint8_t>	resultChar;
-			    const std::regex rgx("( )+");			// regex pattern splituje na bilo kakav white space
-			    std::sregex_token_iterator iter(input_line.begin(), input_line.end(), rgx, -1);
-			    for (std::sregex_token_iterator end; iter != end; ++iter) {
-			    	/*
-			    	 * Npr:
-			    	 * input_line = "5a 4f 54 4a 41"
-			    	 * regex splituje na vektor stringova { "5a", "4f", "54", "4a", "41" }
-			    	 * "stoi" = string to int, base 16
-			    	 * intVal = integer od svakog elementa { 90,   79,   84,   74,   65 }
-			    	 * hexChar = castujem svaki u 8-bitni broj <-- OVO saljem na serijski port
-			    	 *
-			    	 * primer "A  T"
-			    	 *         41 54 0d 0a
-			    	 * odgovor OK
-			    	 *
-			    	 * primer "A  T  +  C  G  M  M"
-			    	 *         41 54 2b 43 47 4d 4d		0d 0a
-			    	 * odgovor SIMCOM_SIM7600E-H
-			    	 *
-			    	 * primer "A  T  +  C  S  U  B"
-			    	 *         41 54 2b 43 53 55 42		0d 0a
-			    	 * odgovor +CSUB: B04V03
-			    	 *         +CSUB: MDM9x07_LE20_S_22_V1.03_210527
-			    	 * paznja! odgovor sadrzi dva reda!
-			    	 *
-			    	 */
-					int intVal		=			stoi(iter->str(), 0, 16);		// int reprezentacija ukucanog stringa
-					uint8_t hexChar	= (uint8_t)	stoi(iter->str(), 0, 16);		// cast to 8-bit, OVO se salje na serijski port
+    thread ttx(tx, serial);
+    thread rrx(rx, serial);
 
-					// vektori sluze samo za prikaz
-					splitStr.push_back(iter->str());
-					resultInt16base.push_back(intVal);
-			    	resultChar.push_back(hexChar);
-					serial.writeChar(hexChar);
-					// cout << "s=" << iter->str() << "\t h=" << intVal << "\t x=" << hexChar << endl;
-					usleep(1000);		// malo pauze izmedju karaktera (1mS)
-			    }
-			    cout << "hex str=";
-			    for (unsigned int i = 0; i < splitStr.size(); ++i) { cout << " " << splitStr.at(i); }
-			    cout << endl;
-
-			    cout << "str2int=";
-			    for (unsigned int i = 0; i < splitStr.size(); ++i) { cout << " " << resultInt16base.at(i); }
-			    cout << endl;
-
-			    cout << "8bitchr=";
-			    for (unsigned int i = 0; i < splitStr.size(); ++i) { cout << " " << resultChar.at(i); }
-			    cout << endl;
-
-
-			    // buffer za primljene karaktere
-			    unsigned int rcvSize = 2000;
-			    for (int i = 0; i < 3; ++i) {
-				    char rcv[rcvSize];
-				    if (serial.available() > 0) {
-				    	serial.readString(rcv, '\n', rcvSize, 100);
-						cout << "odgovor " << rcv << endl;
-					}
-				}
-
-			    usleep(1000 * 2000);		// dve sekunde pauze izmedju redova
-
-			}
-		}
-    }
-
+    ttx.join();
     serial.closeDevice();    // Close the serial device
 
-	return 0;
+    return 0;
+
+//    LineParser *lp = new LineParser();
+//    string input_line;
+//    while(cin){
+//    	getline(cin, input_line);
+//    	cout << input_line << endl;
+//    	if (input_line.compare(".") == 0) {
+//			cout << "Ћао!" << endl;
+//			break;
+//		} else {
+//			if(input_line.size() > 0) {
+//				vector<uint8_t> rezultat = lp->parse(input_line);
+//
+//			    // buffer za primljene karaktere
+//			    unsigned int rcvSize = 2000;
+//			    for (int i = 0; i < 3; ++i) {
+//				    char rcv[rcvSize];
+//				    if (serial.available() > 0) {
+//				    	serial.readString(rcv, '\n', rcvSize, 100);
+//						cout << "odgovor " << rcv << endl;
+//					}
+//				}
+//
+//			    usleep(1000 * 2000);		// dve sekunde pauze izmedju redova
+//
+//			}
+//		}
+//    }
+//
+//    serial.closeDevice();    // Close the serial device
+
+//	return 0;
 }
