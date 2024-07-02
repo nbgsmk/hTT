@@ -59,8 +59,8 @@ void tx(SeriaLib sr, TerminalMode txMod, bool isRedirekcija) {
 				this_thread::yield();
 				if (isRedirekcija) {
 					for (int i = 0; i < 500; ++i) {
+						this_thread::sleep_for(20ms);
 						this_thread::yield();
-						this_thread::sleep_for(10ms);
 
 					}
 				}
@@ -77,11 +77,22 @@ void rx(SeriaLib sr, TerminalMode rxMod) {
 		char rcv[rcvSize];
 		unsigned int avail = sr.available();
 		if (avail > 0) {
-			 sr.readBytes(rcv, rcvSize, 20, 200);
-//			sr.readString(rcv, '\r', rcvSize - 1, 5);
+//			 sr.readBytes(rcv, rcvSize, 20, 200);
+			sr.readString(rcv, '\r', rcvSize - 1, 0);
+			/*
+			 * FULL FREEZE ASCII MODE - dobijam jednu po jednu _kompletnu_ liniju, kako stizu iz remote uredjaja
+			 * ----------------------
+			 * delimiter = \r ili 0xd. Portable: \r je system independent, a 0xd je linux specific.
+			 * timeout = 0 (izgleda da to znaci beskonacno)
+			 * Ako je timeout > 0, pa istekne dok jos pristizu karakteri, getline vraca nekompletnu liniju tj ono sto je dotle stiglo.
+			 * Za ascii mode od modema to nije dobro.
+			 */
 			switch (rxMod) {
 				case modeASCII:{
-					cout << rcv;
+					string ociscen = string(rcv);
+					ociscen.erase(std::remove(ociscen.begin(), ociscen.end(), '\r'), ociscen.end());
+					ociscen.erase(std::remove(ociscen.begin(), ociscen.end(), '\n'), ociscen.end());
+					cout << ociscen << endl;
 					break;
 				}
 
@@ -111,6 +122,7 @@ void rx(SeriaLib sr, TerminalMode rxMod) {
 				}
 			}
 		} else {
+			this_thread::sleep_for(20ms);
 			this_thread::yield();
 		}
 	}
@@ -119,7 +131,7 @@ void rx(SeriaLib sr, TerminalMode rxMod) {
 int main(int argCnt, char *argVal[]) {
 	for (int i = 0; i < argCnt; ++i) {
 		string a = argVal[i];
-		if (a.compare("-d") == 0) {
+		if ( (a.compare("-d") == 0) || ((a.compare("-D") == 0)) ) {
 			SERIAL_PORT = argVal[i+1];
 
 		} else if (a.compare("-b") == 0) {
