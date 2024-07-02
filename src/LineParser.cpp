@@ -32,7 +32,7 @@ vector<uint8_t> LineParser::parse(string input_line) {
     for (std::sregex_token_iterator end; iter != end; ++iter) {
     	/*
     	 * Npr:
-    	 * input_line = "5a 4f 54 4a 41"
+    	 * input_line = "5a 4f 54 4a 41 0a 0d"
     	 * regex splituje na vektor stringova { "5a", "4f", "54", "4a", "41" }
     	 * "stoi" = string to int, base 16
     	 * intVal = integer od svakog elementa { 90,   79,   84,   74,   65 }
@@ -43,7 +43,7 @@ vector<uint8_t> LineParser::parse(string input_line) {
     	 * odgovor OK
     	 *
     	 * primer "A  T  +  C  G  M  M"
-    	 *         41 54 2b 43 47 4d 4d		0d 0a
+    	 *         41 54 2b 43 47 4d 4d 0d 0a
     	 * odgovor SIMCOM_SIM7600E-H
     	 *
     	 * primer "A  T  +  C  S  U  B"
