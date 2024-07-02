@@ -6,6 +6,7 @@
  */
 
 #include <iostream>
+#include <iomanip>
 #include <cinttypes>
 #include <regex>        // regex, sregex_token_iterator
 
@@ -39,15 +40,15 @@ vector<uint8_t> LineParser::parse(string input_line) {
     	 * hexChar = castujem svaki u 8-bitni broj <-- OVO saljem na serijski port
     	 *
     	 * primer "A  T"
-    	 *         41 54 0d 0a
+    	 *         41 54 0d
     	 * odgovor OK
     	 *
     	 * primer "A  T  +  C  G  M  M"
-    	 *         41 54 2b 43 47 4d 4d 0d 0a
+    	 *         41 54 2b 43 47 4d 4d 0d
     	 * odgovor SIMCOM_SIM7600E-H
     	 *
     	 * primer "A  T  +  C  S  U  B"
-    	 *         41 54 2b 43 53 55 42		0d 0a
+    	 *         41 54 2b 43 53 55 42 0d
     	 * odgovor +CSUB: B04V03
     	 *         +CSUB: MDM9x07_LE20_S_22_V1.03_210527
     	 * paznja! odgovor sadrzi dva reda!
@@ -82,16 +83,23 @@ int LineParser::getLogLevel() {
 
 void LineParser::logPrint(vector<string> stringovi, vector<int> intovi, vector<uint8_t> charovi) {
     if ( (this->logEnabled) & (this->logLevel > 0) ) {
-		cout << "hex str=";
-		for (unsigned int i = 0; i < stringovi.size(); ++i) { cout << " " << stringovi.at(i); }
-		cout << endl;
+    	stringstream hss;
+    	stringstream intss;
+    	stringstream charss;
 
-		cout << "str2int=";
-		for (unsigned int i = 0; i < intovi.size(); ++i) { cout << " " << intovi.at(i); }
-		cout << endl;
+		for (unsigned int i = 0; i < stringovi.size(); ++i) {  hss << setfill(' ') << setw(4) << stringovi.at(i); }
+		for (unsigned int i = 0; i < intovi.size(); ++i) {   intss << setfill(' ') << setw(4) << intovi.at(i); }
+		for (unsigned int i = 0; i < charovi.size(); ++i) {
+			char c = charovi.at(i);
+			if ( (c>=0x20) && (c<0x7e) ) {
+				charss << setfill(' ') << setw(4) << charovi.at(i);
+			} else {
+				charss << setfill(' ') << setw(4) << " ";
+			}
+		}
+		cout << "hex str=" << hss.str() << endl;
+		cout << "hex2int=" << intss.str() << endl;
+		cout << "  ascii=" << charss.str() << endl;
 
-		cout << "8bitchr=";
-		for (unsigned int i = 0; i < charovi.size(); ++i) { cout << " " << charovi.at(i) << " "; }
-		cout << endl;
 	}
 }

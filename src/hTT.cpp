@@ -56,12 +56,13 @@ void tx(SeriaLib sr, TerminalMode txMod, bool isRedirekcija) {
 						break;
 					}
 				}
-				this_thread::yield();
-				if (isRedirekcija) {
-					for (int i = 0; i < 500; ++i) {
-						this_thread::sleep_for(20ms);
-						this_thread::yield();
+				this_thread::yield();	// svakako yield
 
+				if (isRedirekcija) {	// ako je redirekcija ulaza, potrebna je pauza izmedju poslatih linija
+					// 500 * 10ms = 5 sekundi
+					for (int i = 0; i < 500; ++i) {
+						this_thread::sleep_for(10ms);
+						this_thread::yield();
 					}
 				}
 			}
@@ -77,18 +78,17 @@ void rx(SeriaLib sr, TerminalMode rxMod) {
 		char rcv[rcvSize];
 		unsigned int avail = sr.available();
 		if (avail > 0) {
-//			 sr.readBytes(rcv, rcvSize, 20, 200);
-			sr.readString(rcv, '\r', rcvSize - 1, 0);
-			/*
-			 * FULL FREEZE ASCII MODE - dobijam jednu po jednu _kompletnu_ liniju, kako stizu iz remote uredjaja
-			 * ----------------------
-			 * delimiter = \r ili 0xd. Portable: \r je system independent, a 0xd je linux specific.
-			 * timeout = 0 (izgleda da to znaci beskonacno)
-			 * Ako je timeout > 0, pa istekne dok jos pristizu karakteri, getline vraca nekompletnu liniju tj ono sto je dotle stiglo.
-			 * Za ascii mode od modema to nije dobro.
-			 */
 			switch (rxMod) {
 				case modeASCII:{
+					sr.readString(rcv, '\r', rcvSize - 1, 0);
+					/*
+					 * FULL FREEZE ASCII MODE - dobijam jednu po jednu _kompletnu_ liniju, kako stizu iz remote uredjaja
+					 * ----------------------
+					 * delimiter = \r ili 0xd. Portable: \r je system independent, a 0xd je linux specific.
+					 * timeout = 0 (izgleda da to znaci beskonacno)
+					 * Ako je timeout > 0, pa istekne dok jos pristizu karakteri, getline vraca nekompletnu liniju tj ono sto je dotle stiglo.
+					 * Za ascii mode od modema to nije dobro.
+					 */
 					string ociscen = string(rcv);
 					ociscen.erase(std::remove(ociscen.begin(), ociscen.end(), '\r'), ociscen.end());
 					ociscen.erase(std::remove(ociscen.begin(), ociscen.end(), '\n'), ociscen.end());
@@ -97,27 +97,47 @@ void rx(SeriaLib sr, TerminalMode rxMod) {
 				}
 
 				case modeHEX:{
+					sr.readBytes(rcv, rcvSize, 20, 200);
 					stringstream  hs;
 					stringstream  chs;
 					for (unsigned int i = 0; i < avail; ++i) {
-//						cout << setfill('0') << setw(2) << hex << static_cast<int>(rcv[i]) << dec << " ";
 						hs << setfill('0') << setw(2) << hex << static_cast<int>(rcv[i]) << dec << " ";
 					}
 					for (unsigned int i = 0; i < avail; ++i) {
-//						cout << setfill(' ') << setw(2) << rcv[i] << " ";
-						chs << setw(2) << rcv[i] << " ";
+						char c = rcv[i];
+						if( (c >= 0x20) && (c<=0x7e) ){
+							chs << setfill(' ') << setw(2) << rcv[i] << " ";
+						} else {
+							chs << setfill(' ') << setw(2) << " " << " ";
+						}
 					}
 					if (avail == 1) {
-						cout << "(" << avail << ") hex: " << hs.str() << "\t" << "ascii: " << chs.str() << endl;
+						/*
+						 * ako je samo jedan karakter, prikaz je vertikalan
+						 * (1) hex: 	7a 	ascii:  z
+						 * (1) hex: 	6f 	ascii:  o
+						 * (1) hex: 	74 	ascii:  t
+						 * (1) hex: 	6a 	ascii:  j
+						 * (1) hex: 	61 	ascii:  a
+						 */
+						cout << "(" << avail << ") hex: \t" << hs.str() << "\t" << "ascii: " << chs.str() << endl;
 					} else if (avail > 1) {
-						cout << "(" << avail << ") hex: " << hs.str() << endl;
-						cout << "  ascii: " << chs.str() << endl;
+						/*
+						 * ako je vise karaktera, idemo horizontalno
+						 * (8) chars
+						 *   hex: 6f 64 67 6f 76 6f 72 20
+						 * ascii:  o  d  g  o  v  o  r
+						 */
+						cout << "(" << avail << ") chars" << endl;
+						cout << "  hex: " << hs.str() << endl;
+						cout << "ascii: " << chs.str() << endl;
 					}
 					break;
 				}
 
 				default: {
-					cout << rcv;
+					cout << "Unknown operation mode! Neigher ascii or hex. Check your command line." << endl;
+					cout << "received: " << rcv;
 					break;
 				}
 			}
@@ -145,7 +165,7 @@ int main(int argCnt, char *argVal[]) {
 			txMode = modeHEX;
 			rxMode = modeHEX;
 
-		} else if ( (a.compare("--h") == 0) || ((a.compare("--help") == 0)) || ((a.compare("-?") == 0)) ) {
+		} else if ( ((a.compare("--help") == 0)) || ((a.compare("-?") == 0)) ) {
 			string usage = "usage: hTT -d <device> -b <baud> [-a|-h]	\n";
 			usage += "-d device eg. /dev/ttyUSB0						\n";
 			usage += "-b baud_rate for serial port						\n";
