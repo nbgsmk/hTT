@@ -15,7 +15,9 @@ Pozdrav!
     // i sacekas malo
     // dobije se izvrsni fajl hTT
 
-    // pokrenes ga
+    hmm...ako kaze da ne zna sta je komanda g++, probaj da instaliras g++ sa sudo apt-get install build-essential a onda ponovo g++ ...to prethodno
+
+    // kad se kompajlira, pokrenes ga
     ./hTT    obrati paznju na ./
 
 Dalje sve pise :-)
