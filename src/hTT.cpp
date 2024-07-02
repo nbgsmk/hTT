@@ -145,6 +145,24 @@ int main(int argCnt, char *argVal[]) {
 			txMode = modeHEX;
 			rxMode = modeHEX;
 
+		} else if ( (a.compare("--h") == 0) || ((a.compare("--help") == 0)) || ((a.compare("-?") == 0)) ) {
+			string usage = "usage: hTT -d <device> -b <baud> [-a|-h]	\n";
+			usage += "-d device eg. /dev/ttyUSB0						\n";
+			usage += "-b baud_rate for serial port						\n";
+			usage += "-[a|h] ascii or hex mode							\n";
+			usage += "-? --help this help message						\n";
+			usage += "													\n";
+			usage += "example:											\n";
+			usage += "    hTT -d /dev/ttyUSB4 -b 9600 -a	(test AT commands of a modem)					\n";
+			usage += "    hTT -d /dev/ttyS0   -b 9600 -h	(test hex commands of a proprietary device)		\n";
+
+			cout << "Welcome to " << string(argVal[0]) << ", a hex Terminal Tester" << endl;
+			cout << endl;
+			cout << usage << endl;
+			return 0;
+
+			usage += "ex: hTT -d /dev/ttyUSB0 -b 9600 -h				\n";
+
 		}
 
 	}
