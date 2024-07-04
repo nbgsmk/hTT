@@ -9,6 +9,7 @@ hTT - hex Terminal Tester
 - clone repo  
 - build the executable
 
+~~~
 	ssh pi@zero.local
 	or
 	ssh pi@192.168.....
@@ -28,7 +29,7 @@ hTT - hex Terminal Tester
 	$ ls -la						// check the result
 	...
 	-rwxrwxr-x 1 user user 692088 јул  4 21:42 hTT		// and verify the executable exists
-
+~~~
 **NOTES on g++**
 
 
