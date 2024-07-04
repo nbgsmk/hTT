@@ -23,7 +23,7 @@ hTT - hex Terminal Tester
 	$ pwd							// check where we are
 	/home/pi/hTT/src					// expected result something like this
 	
-	$ g++ *.cpp -o hTT					// compile the application
+	$ g++ *.cpp -pthread -o hTT				// compile the application
 	// this may take a while
 	
 	$ ls -la						// check the result
@@ -49,15 +49,17 @@ Then repeat the command 'g++ ...' as described above
 
 
 
-#####  2 - Compilation errors mentioning 'std::thread::thread'...  
+#####  2 - Compilation errors 'std::thread::thread'...  
 
-Depending on the running OS version and architecture, try adding some combination of flags: -lpthread -pthread -static
+Depending on the running OS version and architecture, try adding some combination of flags: -pthread -lpthread -static
 ~~~
-	$ g++ *.cpp -lpthread -o hTT		// most of the time this is enough
+	$ g++ *.cpp -o hTT			// no flags needed when compiling with eclipse for c++
 	or
-	$ g++ *.cpp -pthread -o hTT		// sometimes...
+	$ g++ *.cpp -pthread -o hTT		// most of the time this is enough for command line
 	or
-	$ g++ *.cpp -static -o hTT		// most of the time not needed
+	$ g++ *.cpp -lpthread -o hTT		// sometimes...
+	or
+	$ g++ *.cpp -static -o hTT		// usually not needed
 	
 	or a combination of those
 ~~~
