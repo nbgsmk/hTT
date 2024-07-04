@@ -35,26 +35,32 @@ hTT - hex Terminal Tester
 
 ##### 1 - If compiler g++ is not installed, the error message will be like  
 
+~~~
 	Command 'g++' not found...
+~~~
 
 So try to install it
 
+~~~
 	$ sudo apt-get install build-essential			
-	
+~~~
+
 Then repeat the command 'g++ ...' as described above
 
 
 
 #####  2 - Compilation errors mentioning 'std::thread::thread'...  
-Depending on the running OS version and architecture, try adding some combination of flags: -lpthread -pthread -static
 
+Depending on the running OS version and architecture, try adding some combination of flags: -lpthread -pthread -static
+~~~
 	$ g++ *.cpp -lpthread -o hTT		// most of the time this is enough
 	or
-	$ g++ *.cpp -pthread -o hTT			// it depends...
+	$ g++ *.cpp -pthread -o hTT		// sometimes...
 	or
-	$ g++ *.cpp -static -o hTT			// most of the time not needed
+	$ g++ *.cpp -static -o hTT		// most of the time not needed
 	
 	or a combination of those
+~~~
 
 3 - If the compiled executable crashes on start, try a different combunation of above flags and run again.
 
@@ -71,22 +77,25 @@ If hTT is already installed, and you need to update it from github, the steps ar
 - git pull
 - compile the code
 
+~~~
 	ssh pi@zero.local				// again, connect, eg with ssh
 	
-	$ pwd							// check where we are
-	/home/pi						// should be your home folder
+	$ pwd						// check where we are
+	/home/pi					// should be your home folder
 	
-	$ ls -l						// check the contents
+	$ ls -l						// check what is there
 	...
-	drwxrwxr-x 1 user user 72 јул  4 20:58 hTT		// look for the name of previously cloned repo
+	drwxrwxr-x 1 user user 72 јул  4 20:58 hTT	// look for the folder of previously cloned repo
 	
-	$ cd hTT						// enter the 'hTT' folder. Do _not_ go into 'hTT/src'
+	$ cd hTT					// enter the 'hTT' folder. Do _not_ go into 'hTT/src'
 	/home/pi/hTT					// you should be here
-	$ git pull						// pull updates from github to local machine
-	
+
+	$ git pull					// pull updates from github to local machine
+
+~~~
+
 Application code is updated to the latest version.  
 Compile with g++ as explained earlier.
-
 
 
 
@@ -95,12 +104,14 @@ Compile with g++ as explained earlier.
 
 Check available command line options: 
 
-	$ ./hTT --help						// --help or -?
+~~~
+	$ ./hTT --help					// --help or -?
 	$ cd /home/pi/hTT/src				// go to folder where hTT executable is
 	
-	$ ./hTT -d /dev/ttyS0 -b 9600 -a	// run in ascii mode
+	$ ./hTT -d /dev/ttyS0 -b 9600 -a		// run in ascii mode
 	or
-	$ ./hTT -d /dev/ttyS0 -b 9600 -h	// run in hex mode
+	$ ./hTT -d /dev/ttyS0 -b 9600 -h		// run in hex mode
+~~~
 
 where:  
 -d = specify serial device eg /dev/ttyS0 or /dev/ttyUSB4 or other  
@@ -114,26 +125,25 @@ Run hTT and enter hex codes, separated with spaces.
 Enter commands, one line at the time, press ENTER to send.  
 
 For example: you type "5a 4f 4b 49" and press Enter. That is all.  
-Reply will be shown just below.  
 
 Exit the app with a single dot '.' in a new line, or with Ctrl-C
 
-
+~~~
 	$ ./hTT -d /dev/ttyUSB3 -b 115200 -h
 	
-	41 54 0d						// 'AT' and <newline> as hex characters. Press ENTER to send it
-	hex str=  41  54  0d			// display what is sent in hex
-	hex2int=  65  84  13			// display what is sent in decimal
-	  ascii=   A   T    			// display what is sent in ascii
+	41 54 0d					// 'AT' and <newline> as hex characters. Press ENTER to send it
+	hex str=  41  54  0d				// display what is sent in hex
+	hex2int=  65  84  13				// display what is sent in decimal
+	  ascii=   A   T    				// display what is sent in ascii
 	
-	(6) chars						// received 6 character response
-	hex: 0d 0a 4f 4b 0d 0a 		// hex characters received
-	ascii:      O  K  	     	// ascii equivalent, if any
+	(6) chars					// received 6 character response
+	hex: 0d 0a 4f 4b 0d 0a 				// hex characters received
+	ascii:      O  K  	     			// ascii equivalent, if any
 	
-	41 54 2b 43 47 4d 4d 0d							// entered command
-	hex str=  41  54  2b  43  47  4d  4d  0d		// hex representation
-	hex2int=  65  84  43  67  71  77  77  13		// decimal representation
-	  ascii=   A   T   +   C   G   M   M    		// ascii representation
+	41 54 2b 43 47 4d 4d 0d				// entered command
+	hex str=  41  54  2b  43  47  4d  4d  0d	// hex representation
+	hex2int=  65  84  43  67  71  77  77  13	// decimal representation
+	  ascii=   A   T   +   C   G   M   M    	// ascii representation
 	
 	
 	// received response
@@ -148,7 +158,7 @@ Exit the app with a single dot '.' in a new line, or with Ctrl-C
 	
 	.			// single dot exits the program
 	
-
+~~~
 
 ### ASCII mode
 
@@ -157,6 +167,7 @@ The same as in hex mode, but commands are entered as plain ascii text.
 
 $ ./hTT -d /dev/ttyUSB3 -b 115200 -a
 
+~~~
 	AT
 	OK
 	
@@ -170,24 +181,27 @@ $ ./hTT -d /dev/ttyUSB3 -b 115200 -a
 	
 	.			// single dot to exit
 	
-
+~~~
 
 ### Read input from file
 
-It is possible to redirect input from file, in both ascii or hex mode.  
+It is possible to read input from a file, in both ascii or hex mode.  
 Save the desired commands to a text file, one line at a time. The same as you would enter them into hTT.  
 
 Run hTT with any flags you need, and append redirection at the end:
 
+~~~
 	./hTT _your_flags_ < example_commands.txt
+~~~
 
 The file will be sent to the device, one line at a time, with a few seconds between lines.
 
 #### Finall thoughts
 
-A usefull ASCII chart. Thanks to the author.
+A very nice ASCII chart found here https://www.sciencebuddies.org/cdn/references/ascii-table.png
 
-https://www.sciencebuddies.org/cdn/references/ascii-table.png
+Thanks to the author!  
+
 
 ![ascii-table](https://github.com/nbgsmk/hTT/assets/60575976/3c2747f2-7f34-4800-bd51-9817a3f7b76e)
 
@@ -198,7 +212,6 @@ https://www.sciencebuddies.org/cdn/references/ascii-table.png
 
 https://stackoverflow.com/questions/76299250/how-to-use-getline-in-a-separate-thread-in-c  
 
-Did not try these yet  
 https://stackoverflow.com/a/76334993  
 
 https://www.onlinegdb.com/E9Gwgje7T  
