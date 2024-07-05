@@ -23,7 +23,7 @@ hTT - hex Terminal Tester
 	$ pwd							// check where we are
 	/home/pi/hTT/src					// expected result something like this
 	
-	$ g++ *.cpp -o hTT					// compile the application
+	$ g++ *.cpp -pthread -o hTT				// compile the application
 	// this may take a while
 	
 	$ ls -la						// check the result
@@ -49,15 +49,17 @@ Then repeat the command 'g++ ...' as described above
 
 
 
-#####  2 - Compilation errors mentioning 'std::thread::thread'...  
+#####  2 - Compilation errors 'std::thread::thread'...  
 
-Depending on the running OS version and architecture, try adding some combination of flags: -lpthread -pthread -static
+Depending on the running OS version and architecture, try adding some combination of flags: -pthread -lpthread -static
 ~~~
-	$ g++ *.cpp -lpthread -o hTT		// most of the time this is enough
+	$ g++ *.cpp -o hTT			// no flags needed when compiling with eclipse for c++
 	or
-	$ g++ *.cpp -pthread -o hTT		// sometimes...
+	$ g++ *.cpp -pthread -o hTT		// most of the time this is enough for command line
 	or
-	$ g++ *.cpp -static -o hTT		// most of the time not needed
+	$ g++ *.cpp -lpthread -o hTT		// sometimes...
+	or
+	$ g++ *.cpp -static -o hTT		// usually not needed
 	
 	or a combination of those
 ~~~
@@ -210,6 +212,20 @@ Thanks to the author!
 
 #### --------- Usefull ideas, some tested, some not --------  
 
+**serial port sniffer!** 
+
+https://unix.stackexchange.com/questions/12359/how-can-i-monitor-serial-port-traffic  
+
+https://unix.stackexchange.com/a/542819  
+~~~
+strace -s 9999 -e read -ffp $(sed '/ttyUSB0/s/^.*proc.\([0-9]\+\).fd.*/\1/p;d' <(ls -l /proc/[1-9]*/fd/* 2>/dev/null)) |& perl -e '$|=1;my %qa=(a=>7,b=>10,e=>33,f=>14,n=>12,r=>15,t=>11);sub cnv { my $ch=$_[0];$ch=$qa{$1} if $ch=~/([abefnrt])/;return chr(oct($ch));  };while (<>) { /^read.\d+,\s+"(.*)",\s\d+.*$/ && do { $_=$1;s/\\(\d+|[abefnrt])/cnv($1)/eg;print; };};'
+
+I run them by using syntax:
+script -t ttySniff.log 2>ttySniff.tm -c "./ttySniff.sh USB0"
+so I could replay the whole operation and trace timing executions.
+~~~
+
+-----------
 https://stackoverflow.com/questions/76299250/how-to-use-getline-in-a-separate-thread-in-c  
 
 https://stackoverflow.com/a/76334993  
