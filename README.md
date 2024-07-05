@@ -225,7 +225,9 @@ script -t ttySniff.log 2>ttySniff.tm -c "./ttySniff.sh USB0"
 so I could replay the whole operation and trace timing executions.
 ~~~
 
------------
+##### Others
+
+
 https://stackoverflow.com/questions/76299250/how-to-use-getline-in-a-separate-thread-in-c  
 
 https://stackoverflow.com/a/76334993  
