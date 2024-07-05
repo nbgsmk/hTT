@@ -212,6 +212,20 @@ Thanks to the author!
 
 #### --------- Usefull ideas, some tested, some not --------  
 
+**serial port sniffer!** 
+
+https://unix.stackexchange.com/questions/12359/how-can-i-monitor-serial-port-traffic  
+
+https://unix.stackexchange.com/a/542819  
+~~~
+strace -s 9999 -e read -ffp $(sed '/ttyUSB0/s/^.*proc.\([0-9]\+\).fd.*/\1/p;d' <(ls -l /proc/[1-9]*/fd/* 2>/dev/null)) |& perl -e '$|=1;my %qa=(a=>7,b=>10,e=>33,f=>14,n=>12,r=>15,t=>11);sub cnv { my $ch=$_[0];$ch=$qa{$1} if $ch=~/([abefnrt])/;return chr(oct($ch));  };while (<>) { /^read.\d+,\s+"(.*)",\s\d+.*$/ && do { $_=$1;s/\\(\d+|[abefnrt])/cnv($1)/eg;print; };};'
+
+I run them by using syntax:
+script -t ttySniff.log 2>ttySniff.tm -c "./ttySniff.sh USB0"
+so I could replay the whole operation and trace timing executions.
+~~~
+
+-----------
 https://stackoverflow.com/questions/76299250/how-to-use-getline-in-a-separate-thread-in-c  
 
 https://stackoverflow.com/a/76334993  
