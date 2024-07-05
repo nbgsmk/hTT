@@ -41,9 +41,12 @@ void tx(SeriaLib sr, TerminalMode txMod, bool isRedirekcija) {
 				switch (txMod) {
 					case modeHEX:{
 						vector<uint8_t> hexCharovi = lp->parse(input_line);
+						sr.flushReceiver();
 						for (unsigned int i = 0; i < hexCharovi.size(); ++i) {
 							sr.writeChar(hexCharovi.at(i));
+							usleep(250);
 						}
+						cout << endl;
 						break;
 					}
 					case modeASCII: {
@@ -97,7 +100,7 @@ void rx(SeriaLib sr, TerminalMode rxMod) {
 				}
 
 				case modeHEX:{
-					sr.readBytes(rcv, rcvSize, 20, 200);
+					sr.readBytes(rcv, rcvSize, 25, 200);
 					stringstream  hs;
 					stringstream  chs;
 					for (unsigned int i = 0; i < avail; ++i) {
@@ -128,9 +131,11 @@ void rx(SeriaLib sr, TerminalMode rxMod) {
 						 *   hex: 6f 64 67 6f 76 6f 72 20
 						 * ascii:  o  d  g  o  v  o  r
 						 */
-						cout << "(" << avail << ") chars" << endl;
+						cout << endl;
+						cout << "rx (" << avail << ") chars" << endl;
 						cout << "  hex: " << hs.str() << endl;
 						cout << "ascii: " << chs.str() << endl;
+						cout << endl;
 					}
 					break;
 				}
@@ -142,7 +147,7 @@ void rx(SeriaLib sr, TerminalMode rxMod) {
 				}
 			}
 		} else {
-			this_thread::sleep_for(20ms);
+			this_thread::sleep_for(50ms);
 			this_thread::yield();
 		}
 	}
